@@ -2,9 +2,16 @@
   "name": "ardrive-get-files",
   "version": "1.0.0",
   "description": "Export data of files in an ArDrive-drive",
+  "type": "module",
   "main": "index.js",
+  
+  "dependencies": {
+		"ardrive-core-js": "^0.5.1",
+		"arweave": "^1.10.11"
+  },
+
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node ./index.js"
   },
   "keywords": [
     "ArDrive",
