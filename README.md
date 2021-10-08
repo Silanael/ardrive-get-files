@@ -12,9 +12,14 @@ Arweave | zPZe0p1Or5Kc0d7YhpT5kBC-JUPcDzUPJeMz2FdFiy4
 ArDrive | [a44482fd-592e-45fa-a08a-e526c31b87f1](https://app.ardrive.io/#/drives/a44482fd-592e-45fa-a08a-e526c31b87f1?name=Silanael)
 
 
+
+
 ## Requirements
 - node.js
 - NPM
+
+
+
 
 ## Install Node.js
 
@@ -28,6 +33,8 @@ ArDrive | [a44482fd-592e-45fa-a08a-e526c31b87f1](https://app.ardrive.io/#/drives
 Refer to https://nodejs.org
 
 
+
+
 ## How to build
 `npm install` OR `npm install --no-bin-links` if symlinks aren't a thing.
 
@@ -37,9 +44,12 @@ Refer to https://nodejs.org
 `npm start` OR `node index.js` OR `./index.js`
 
 
+
 ## Known issues
 - Moved/reuploaded/renamed files produce multiple entries.
+- Throws an exception if a private drive ID is used. CBA to fix.
   
+
 
 ## TODO (maybe)
 - An option to scan for drives.
@@ -47,6 +57,7 @@ Refer to https://nodejs.org
 - Might add an option to prune the duplicates at some point.
 - Command-line parameters could be nice.
 - Maybe package into a binary.
+
 
 
 ## What is this?
