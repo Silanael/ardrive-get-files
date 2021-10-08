@@ -1,7 +1,7 @@
 {
   "name": "ardrive-get-files",
   "version": "1.0.0",
-  "description": "Export data of files in an ArDrive-drive",
+  "description": "Export information about files in an ArDrive-drive in CSV-format.",
   "main": "index.js",
   
   "dependencies": {
@@ -11,7 +11,8 @@
   },
 
   "scripts": {
-    "test": "node ./index.js"
+    "start": "node index.js",
+    "test": "node index.js"
   },
   "keywords": [
     "ArDrive",

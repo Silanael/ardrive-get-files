@@ -33,7 +33,7 @@ Refer to https://nodejs.org
 
 
 ## How to run
-`node index.js` or `./index.js`
+`npm start` OR `node index.js` OR `./index.js`
 
 
 

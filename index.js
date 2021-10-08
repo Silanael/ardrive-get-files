@@ -36,29 +36,39 @@ async function main ()
 
     // Get drive information from the user    
     //  
-    const arweave_address = prompt ("Enter Arweave-address: ").replace (/[^a-zA-Z0-9\-]/g, '');
-    if (arweave_address == "")
+    let arweave_address = prompt ("Enter Arweave-address: ")
+    if (arweave_address == null || arweave_address == "")
     {
         console.error ("Aborted.");
         process.exit (-1);
     }
+    arweave_address = arweave_address.replace (/[^a-zA-Z0-9\-]/g, '');
 
-    const drive_id = prompt ("Enter Drive ID: ").replace (nl, "").replace (/[^a-zA-Z0-9\-]/g, '');
-    if (drive_id == "")
+
+    let drive_id = prompt ("Enter Drive ID: ");
+    if (drive_id == null || drive_id == "")
     {
         console.error ("Aborted.");        
         process.exit (-1);
     }
+    drive_id = drive_id.replace (/[^a-zA-Z0-9\-]/g, '');
+
 
     let output_file = prompt ("Enter output file (ENTER for default: " + default_output_file + "): ");
-    if (output_file == "") output_file = default_output_file;
+    if (output_file == null || output_file == "") output_file = default_output_file;
 
     console.log ("Output modes:");
     console.log ("0) filename, data TX ID");
     console.log ("1) filename, data TX ID, ar://, arweave.net");
     console.log ("2) extensive");
     let output_mode = prompt ("Enter output mode [0/1/2] (ENTER for default: 1): ");
-    if (output_mode == "") output_mode = mode_default;
+    
+    if (output_mode == null)
+    {
+        console.error ("Aborted.");        
+        process.exit (-1);
+    }
+    else if (output_mode == "") output_mode = mode_default;
     else output_mode = parseInt (output_mode, 10);
     
     
