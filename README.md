@@ -29,7 +29,7 @@ Refer to https://nodejs.org
 
 
 ## How to build
-`npm install`
+`npm install` OR `npm install --no-bin-links` if symlinks aren't a thing.
 
 
 
@@ -44,7 +44,8 @@ Refer to https://nodejs.org
 ## TODO (maybe)
 - See if there would be a way to do the fetch without creating a DB/user.
 - Might add an option to prune the duplicates at some point.
-- Package into a binary.
+- Command-line parameters could be nice.
+- Maybe package into a binary.
 
 
 ## What is this?
