@@ -1,0 +1,15 @@
+{
+  "name": "ardrive-get-files",
+  "version": "1.0.0",
+  "description": "Export data of files in an ArDrive-drive",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "ArDrive",
+    "csv"
+  ],
+  "author": "Silanael",
+  "license": "GPL-2.0"
+}
