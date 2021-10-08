@@ -7,7 +7,7 @@
   
   "dependencies": {
 		"ardrive-core-js": "^0.5.1",
-		"arweave": "^1.10.11"
+		"arweave": "^1.10.11"    
   },
 
   "scripts": {
