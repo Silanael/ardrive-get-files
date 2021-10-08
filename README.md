@@ -1,5 +1,6 @@
 # ardrive-get-files
-(C) Silanael 2021-10-08
+Silanael 2021-10-08
+
 
 
 ## Contact info
@@ -36,10 +37,21 @@ Refer to https://nodejs.org
 `npm start` OR `node index.js` OR `./index.js`
 
 
+## Known issues
+- Moved/reuploaded/renamed files produce multiple entries.
+  
+
+## TODO (maybe)
+- See if there would be a way to do the fetch without creating a DB/user.
+- Might add an option to prune the duplicates at some point.
+- Package into a binary.
+
 
 ## What is this?
 A Javascript-program that fetches information files on a selected ArDrive public drive
 located in a given Arweave-address, saving this data in CSV-format.
+Will probably get deprecated once the new version of [ardrive-cli](https://github.com/ardriveapp/ardrive-cli) is ready,
+wrote this now due to there being multiple requests for CSV-exporting on ArDrive's Discord server.
 
 
 

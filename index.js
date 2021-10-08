@@ -21,7 +21,6 @@ const fs                       = require ('fs');
 
 
 // Constants
-const default_output_file = "out.csv";
 const nl                  = "\n";
 const mode_nametx         = 0;
 const mode_default        = 1;
@@ -54,8 +53,26 @@ async function main ()
     drive_id = drive_id.replace (/[^a-zA-Z0-9\-]/g, '');
 
 
+    // Generate the default output file
+    const now = new Date ();
+    const default_output_file = now.getFullYear () 
+                                + "-" 
+                                + String (now.getMonth () ).padStart (2, '0')
+                                + "-" 
+                                + String (now.getDate  () ).padStart (2, '0')
+                                + "_" 
+                                + "ArDrive-" + drive_id + "_Files.csv"
+
+
     let output_file = prompt ("Enter output file (ENTER for default: " + default_output_file + "): ");
-    if (output_file == null || output_file == "") output_file = default_output_file;
+    if (output_file == null)
+    {
+        console.error ("Aborted.");        
+        process.exit (-1);        
+    }
+    else if (output_file == "") output_file = default_output_file;
+
+
 
     console.log ("Output modes:");
     console.log ("0) filename, data TX ID");
