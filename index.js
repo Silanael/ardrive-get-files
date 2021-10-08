@@ -9,6 +9,9 @@
 //    Arweave: zPZe0p1Or5Kc0d7YhpT5kBC-JUPcDzUPJeMz2FdFiy4
 //    ArDrive: a44482fd-592e-45fa-a08a-e526c31b87f1
 //
+//  Might further tidy this thing into functions at some point.
+//  We'll see.
+//
 
 
 // Imports
@@ -27,35 +30,35 @@ const mode_default        = 1;
 const mode_extensive      = 2;
 
 
+// Variables
+var output_file;
+var default_output_file;
 
 
+
+// Start
 async function main ()
 {
 
-
     // Get drive information from the user    
     //  
-    let arweave_address = prompt ("Enter Arweave-address: ")
+    let arweave_address = prompt ("Enter Arweave-address: ")    
     if (arweave_address == null || arweave_address == "")
-    {
-        console.error ("Aborted.");
-        process.exit (-1);
-    }
+        Abort ();    
+
     arweave_address = arweave_address.replace (/[^a-zA-Z0-9\-]/g, '');
 
 
     let drive_id = prompt ("Enter Drive ID: ");
     if (drive_id == null || drive_id == "")
-    {
-        console.error ("Aborted.");        
-        process.exit (-1);
-    }
+        Abort ();
+    
     drive_id = drive_id.replace (/[^a-zA-Z0-9\-]/g, '');
 
 
     // Generate the default output file
     const now = new Date ();
-    const default_output_file = now.getFullYear () 
+    default_output_file = now.getFullYear () 
                                 + "-" 
                                 + String (now.getMonth () ).padStart (2, '0')
                                 + "-" 
@@ -64,14 +67,8 @@ async function main ()
                                 + "ArDrive-" + drive_id + "_Files.csv"
 
 
-    let output_file = prompt ("Enter output file (ENTER for default: " + default_output_file + "): ");
-    if (output_file == null)
-    {
-        console.error ("Aborted.");        
-        process.exit (-1);        
-    }
-    else if (output_file == "") output_file = default_output_file;
-
+    AskOutputFile ();
+    
 
 
     console.log ("Output modes:");
@@ -81,12 +78,13 @@ async function main ()
     let output_mode = prompt ("Enter output mode [0/1/2] (ENTER for default: 1): ");
     
     if (output_mode == null)
-    {
-        console.error ("Aborted.");        
-        process.exit (-1);
-    }
-    else if (output_mode == "") output_mode = mode_default;
-    else output_mode = parseInt (output_mode, 10);
+        Abort ();
+    
+    else if (output_mode == "")
+        output_mode = mode_default;
+
+    else 
+        output_mode = parseInt (output_mode, 10);
     
     
 
@@ -230,19 +228,23 @@ async function main ()
         console.log ("Writing to " + output_file + "...");
         try
         {
-            fs.writeFileSync (output_file, output)
-            success = true;
-            console.log ("OK");
+            if (fs.existsSync (output_file) && prompt ("File exists. Overwrite? [y/N]").toUpperCase () != "Y")
+                AskOutputFile ();
+            
+            else
+            {
+                fs.writeFileSync (output_file, output)
+                success = true;
+                console.log ("OK");
+            }
         }
 
         catch (exception)
         {
             console.log ("Failed to write to file " + output_file + ":");
             if ( prompt ("Want to change the destination filename? [y/N]").toUpperCase () == "Y" )
-            {
-                output_file = prompt ("Enter output file (ENTER for default: " + default_output_file + "): ")
-                if (output_file == "") output_file = default_output_file;
-            }
+                AskOutputFile ();
+            
             else
                 process.exit (-1);
         }
@@ -251,4 +253,26 @@ async function main ()
 
 
 
+function Abort ()
+{
+    console.error ("Aborted.");        
+    process.exit (-1);    
+}
+
+
+
+function AskOutputFile ()
+{
+    output_file = prompt ("Enter output file (ENTER for default: " + default_output_file + "): ")
+
+    if (output_file == null)
+        Abort ();
+
+    else if (output_file == "") 
+        output_file = default_output_file;
+}
+
+
+
+// Entrypoint
 main ()

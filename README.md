@@ -42,6 +42,7 @@ Refer to https://nodejs.org
   
 
 ## TODO (maybe)
+- An option to scan for drives.
 - See if there would be a way to do the fetch without creating a DB/user.
 - Might add an option to prune the duplicates at some point.
 - Command-line parameters could be nice.
