@@ -1,59 +1,227 @@
 #!/usr/bin/env node
 //
-// ardrive_get_files.ts
+// ardrive-get-files
+//
 // Silanael 2021-10-08_01
 //
-import * as ardrive from 'ardrive-core-js';
-import { arDriveCommunityOracle, arweave } from 'ardrive-core-js';
+//    Website: www.silanael.com
+//    E-mail:  sila@silanael.com
+//    Arweave: zPZe0p1Or5Kc0d7YhpT5kBC-JUPcDzUPJeMz2FdFiy4
+//    ArDrive: a44482fd-592e-45fa-a08a-e526c31b87f1
+//
 
 
-// Why does this have to be async?
+// Imports
+const ardrive                  = require ('ardrive-core-js');
+const arweave                  = require ('ardrive-core-js').arweave;
+const arDriveCommunityOracle   = require ('ardrive-core-js').arDriveCommunityOracle;
+const prompt                   = require ('prompt-sync') ();
+const fs                       = require ('fs');
+
+
+
+// Constants
+const default_output_file = "out.csv";
+const nl                  = "\n";
+const mode_nametx         = 0;
+const mode_default        = 1;
+const mode_extensive      = 2;
+
+
+
+
 async function main ()
 {
-    console.log ("Fetching data..");
-
-    const txes = await ardrive.getAllMyDataFileTxs ("zPZe0p1Or5Kc0d7YhpT5kBC-JUPcDzUPJeMz2FdFiy4", "a44482fd-592e-45fa-a08a-e526c31b87f1", 0);
 
 
-    console.log ("Filename,DataTXID,MetadataTXID");
-        
+    // Get drive information from the user    
+    //  
+    const arweave_address = prompt ("Enter Arweave-address: ").replace (/[^a-zA-Z0-9\-]/g, '');
+    if (arweave_address == "")
+    {
+        console.error ("Aborted.");
+        process.exit (-1);
+    }
+
+    const drive_id = prompt ("Enter Drive ID: ").replace (nl, "").replace (/[^a-zA-Z0-9\-]/g, '');
+    if (drive_id == "")
+    {
+        console.error ("Aborted.");        
+        process.exit (-1);
+    }
+
+    let output_file = prompt ("Enter output file (ENTER for default: " + default_output_file + "): ");
+    if (output_file == "") output_file = default_output_file;
+
+    console.log ("Output modes:");
+    console.log ("0) filename, data TX ID");
+    console.log ("1) filename, data TX ID, ar://, arweave.net");
+    console.log ("2) extensive");
+    let output_mode = prompt ("Enter output mode [0/1/2] (ENTER for default: 1): ");
+    if (output_mode == "") output_mode = mode_default;
+    else output_mode = parseInt (output_mode, 10);
+    
+    
+
+
+
+
+
+
+    // Get data of all the files on the drive.
+    // The name of the function is misleading.
+    //
+    console.log ("Acquiring file data..");
+    const txes = await ardrive.getAllMyDataFileTxs (arweave_address, drive_id, 0);
+    
+    if (txes.length <= 0)
+    {
+        console.error ("ERROR: Was unable to get file data for the given Arweave-address / drive.");
+        process.exit (-1);
+    }
+
+
+    
+
+
+    // This is a stupid. 
+    // Had to create a database and a user just to get public file metadata.
+    // Suppose I could have manually downloaded and parsed the .json, but meh.
+    //
     let user = 
     {
         login: 'foo',
         dataProtectionKey: '0',
         walletPrivateKey: '0',
-        walletPublicKey: 'zPZe0p1Or5Kc0d7YhpT5kBC-JUPcDzUPJeMz2FdFiy4',
+        walletPublicKey: '',
         syncFolderPath: '/tmp',
         autoSyncApproval: 0
     };
     
     await ardrive.setupDatabase ("./.tmp");
     let arduser = await ardrive.addNewUser ("foo", user);
+
+
+
+
+
+
+    // CSV first row
+    //
+    let output = ""
+    switch (output_mode)
+    {
+        case mode_nametx:
+            output = "Filename,DataTxID"
+            break;
+
+        case mode_extensive:
+            output = "Filename,DataTxID,ARlink,Arweave.net,Size_Bytes,UNIXTime,MIMEType,App,AppVersion,MetadataTxID"
+            break;
+
+        default:
+            output = "Filename,DataTxID,ARlink,Arweave.net"
+            break;
+    }
+    output = output + nl;
+
+
     
-    
-    /*
     const len = txes.length;
-    for (let c = 0; c < 1; c++)
+    for (let c = 0; c < len; c++)
     {
         let entity_type = txes[c].node.tags.find ( ({name}) => name == "Entity-Type").value;
         
         if (entity_type == "file")
-        {
-            let metadata_tx_id = txes[c].node.id;
+        {            
             let file_id = txes[c].node.tags.find ( ({name}) => name == "File-Id").value;            
-            let data_tx_id = "cafebabe"
+                                  
+            // Get metadata of the file
+            await ardrive.getFileMetaDataFromTx (txes[c], user);
+            let metadata = await ardrive.getByMetaDataTxFromSyncTable (txes[c].node.id);
             
-            //let file = await ardrive.getPublicFileData (metadata_tx_id);
-            //let file = await ardrive.getPublicFileEntity (txes[c], file_id);            
-            let file = await ardrive.getFileMetaDataFromTx (txes[c], arduser);
-            
+            let filename   = metadata.fileName;
+            let data_tx_id = metadata.dataTxId;
+            let meta_tx_id = metadata.metaDataTxId;
+            let filesize   = metadata.fileSize;
+            let unixtime   = metadata.unixTime;
+            let mimetype   = metadata.contentType;
+            let appname    = metadata.appName;
+            let appversion = metadata.appVersion;
+            let arlink     = "ar://" + data_tx_id;
+            let arweavenet = "https://arweave.net/" + data_tx_id;
 
-            console.log ("File:" + file);
-            //console.log (filename + "," + data_tx_id);
+
+            // Add CSV row
+            switch (output_mode)
+            {
+                case mode_nametx:                    
+                    output = output 
+                           + filename    + "," 
+                           + data_tx_id  + ","
+                           + nl                           
+                    break;
+        
+                case mode_extensive:                    
+                    output = output 
+                           + filename    + "," 
+                           + data_tx_id  + "," 
+                           + arlink      + "," 
+                           + arweavenet  + ","
+                           + filesize    + ","
+                           + unixtime    + ","
+                           + mimetype    + ","
+                           + appname     + ","
+                           + appversion  + ","
+                           + meta_tx_id  + ","
+                           + nl;
+                    break;
+        
+                default:                    
+                    output = output 
+                           + filename    + "," 
+                           + data_tx_id  + "," 
+                           + arlink      + "," 
+                           + arweavenet      
+                           + nl;
+                    break;
+            }            
+            
         }
    
     }
-    */
+    
+
+
+
+
+    // Write the gathered data into the output file
+    //
+    let success = false;
+    while (!success)
+    {    
+        console.log ("Writing to " + output_file + "...");
+        try
+        {
+            fs.writeFileSync (output_file, output)
+            success = true;
+            console.log ("OK");
+        }
+
+        catch (exception)
+        {
+            console.log ("Failed to write to file " + output_file + ":");
+            if ( prompt ("Want to change the destination filename? [y/N]").toUpperCase () == "Y" )
+            {
+                output_file = prompt ("Enter output file (ENTER for default: " + default_output_file + "): ")
+                if (output_file == "") output_file = default_output_file;
+            }
+            else
+                process.exit (-1);
+        }
+    }
 }
+
+
 
 main ()
